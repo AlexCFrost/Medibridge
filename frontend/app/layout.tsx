@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import DisclaimerModal from "./components/DisclaimerModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <DisclaimerModal />
         <div className="min-h-screen flex flex-col">
           <header className="bg-blue-600 text-white py-4 px-6">
             <div className="max-w-7xl mx-auto">
