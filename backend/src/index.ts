@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import healthRouter from './routes/health.js';
 import reportRouter from './routes/report';
+import validationRouter from './routes/validation';
 
 dotenv.config();
 
@@ -16,12 +17,14 @@ app.use(express.json());
 // Routes
 app.use('/health', healthRouter);
 app.use('/api', reportRouter);
+app.use('/api', validationRouter);
 
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`API endpoints: http://localhost:${PORT}/api`);
+
 });
 
 export default app;

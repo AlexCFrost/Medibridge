@@ -113,7 +113,7 @@ export const EXAMPLE_RESPONSE: AIReportInterpretation = {
     }
   ],
   disclaimer: "This interpretation is for educational purposes only. It does not constitute medical advice, diagnosis, or treatment. Please discuss these results with your healthcare provider for proper medical interpretation and guidance.",
-  nextSteps: "Schedule a consultation with your healthcare provider to discuss these results in detail. Bring this report and any questions you have."
+  nextSteps: "Schedule a consultation with your healthcare provider to discuss these results in detail. Bring this report and any questions."
 };
 
 /**
