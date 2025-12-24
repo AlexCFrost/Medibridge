@@ -1,5 +1,7 @@
 'use client';
 
+import Tooltip from './Tooltip';
+
 interface TerminologyDefinition {
   term: string;
   definition: string;
@@ -53,6 +55,46 @@ const statusLabels = {
   below_range: 'Below Normal Range',
   unknown: 'Status Unknown',
 };
+
+function highlightTerms(text: string, terminology: TerminologyDefinition[]) {
+  if (!terminology.length) return text;
+
+  const parts: (string | JSX.Element)[] = [];
+  let lastIndex = 0;
+
+  const termMap = new Map(terminology.map(t => [t.term.toLowerCase(), t.definition]));
+  const sortedTerms = [...termMap.keys()].sort((a, b) => b.length - a.length);
+
+  const regex = new RegExp(`\\b(${sortedTerms.join('|')})\\b`, 'gi');
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+
+    const matchedTerm = match[0];
+    const definition = termMap.get(matchedTerm.toLowerCase());
+
+    if (definition) {
+      parts.push(
+        <Tooltip key={match.index} content={definition}>
+          {matchedTerm}
+        </Tooltip>
+      );
+    } else {
+      parts.push(matchedTerm);
+    }
+
+    lastIndex = match.index + matchedTerm.length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? <>{parts}</> : text;
+}
 
 export default function ReportDisplay({ report }: ReportDisplayProps) {
   return (
@@ -113,18 +155,19 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
               <div className="space-y-4">
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">What This Test Measures</h4>
-                  <p className="text-gray-700 leading-relaxed">{test.explanation}</p>
+                  <p className="text-gray-700 leading-relaxed">{highlightTerms(test.explanation, test.terminology)}</p>
                 </div>
 
                 {test.terminology.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Understanding the Terms</h4>
-                    <div className="space-y-2">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Medical Terms</h4>
+                    <div className="flex flex-wrap gap-2">
                       {test.terminology.map((term, termIndex) => (
-                        <div key={termIndex} className="bg-blue-50 rounded-lg p-3">
-                          <span className="font-medium text-blue-900">{term.term}:</span>
-                          <span className="text-blue-800 ml-2">{term.definition}</span>
-                        </div>
+                        <Tooltip key={termIndex} content={term.definition}>
+                          <span className="inline-block px-3 py-1 bg-blue-50 rounded-full text-sm font-medium">
+                            {term.term}
+                          </span>
+                        </Tooltip>
                       ))}
                     </div>
                   </div>
@@ -132,7 +175,7 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
 
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">What This Means</h4>
-                  <p className="text-gray-700 leading-relaxed">{test.context}</p>
+                  <p className="text-gray-700 leading-relaxed">{highlightTerms(test.context, test.terminology)}</p>
                 </div>
               </div>
             </div>
