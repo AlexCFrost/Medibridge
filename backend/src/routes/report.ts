@@ -4,24 +4,9 @@ import { validateForClient } from '../services/validation';
 
 const router = Router();
 
-/**
- * POST /analyze-report
- * Analyzes medical report and returns structured interpretation
- * 
- * Request body:
- * - reportText: string (OCR text or manual input of medical report)
- * 
- * Response follows AIReportInterpretation schema defined in prompts/output-schema.ts
- * with all safety rules and disclaimers from prompts/safety-rules.ts
- * 
- * All responses pass through validation layer for safety checks
- */
 router.post('/analyze-report', (req: Request, res: Response) => {
   try {
-    // Simulate AI response (in production, this would be actual AI output)
     const aiResponse = EXAMPLE_RESPONSE;
-    
-    // Validation layer - defense-in-depth safety check
     const validation = validateForClient(aiResponse);
     
     if (!validation.success) {

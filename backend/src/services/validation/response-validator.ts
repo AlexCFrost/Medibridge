@@ -1,10 +1,3 @@
-/**
- * Response Validator
- * 
- * Validates AI responses for structure, safety, and compliance.
- * Implements multiple validation layers before returning data to clients.
- */
-
 import { isValidInterpretation, AIReportInterpretation } from '../../prompts/output-schema';
 import { scanAIResponse, hasCriticalViolations, ContentViolation, groupViolationsByType } from './content-filter';
 import { sanitizeAIResponse, replaceUnsafeFields } from './sanitizer';
@@ -19,9 +12,6 @@ export interface ValidationResult {
   modifications?: string[];
 }
 
-/**
- * Validate response structure
- */
 function validateStructure(response: any): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   

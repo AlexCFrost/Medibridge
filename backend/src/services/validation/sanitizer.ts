@@ -1,15 +1,5 @@
-/**
- * Response Sanitizer
- * 
- * Sanitizes AI responses by replacing unsafe content with neutral alternatives.
- * This is a defense-in-depth layer that modifies responses to ensure safety.
- */
-
 import { ContentViolation } from './content-filter';
 
-/**
- * Replacement patterns for unsafe content
- */
 const SANITIZATION_RULES = {
   // Diagnostic language replacements
   diagnostic: [

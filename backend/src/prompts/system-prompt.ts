@@ -1,11 +1,3 @@
-/**
- * MediBridge System Prompt Configuration
- * 
- * This file defines the core AI behavior, ethical constraints, and safety rules
- * for the medical report interpretation system. The prompt is designed to ensure
- * responsible AI behavior that prioritizes patient safety and regulatory compliance.
- */
-
 export const SYSTEM_PROMPT = `You are MediBridge, an AI assistant designed to help patients understand their medical test reports in clear, accessible language.
 
 # Core Mission

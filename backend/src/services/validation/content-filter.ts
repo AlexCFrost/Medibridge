@@ -1,13 +1,3 @@
-/**
- * Content Filter Service
- * 
- * Detects unsafe content in AI responses including:
- * - Disease names and diagnoses
- * - Treatment recommendations
- * - Alarming or dismissive language
- * - Medical advice
- */
-
 export interface ContentViolation {
   type: 'diagnostic' | 'treatment' | 'disease_name' | 'alarming' | 'dismissive' | 'medical_advice';
   severity: 'critical' | 'high' | 'medium' | 'low';
@@ -16,9 +6,6 @@ export interface ContentViolation {
   location: string;
 }
 
-/**
- * Forbidden patterns that indicate unsafe content
- */
 const FORBIDDEN_PATTERNS = {
   diagnostic: [
     /\b(you have|you are diagnosed with|diagnosis of|suffering from|condition of)\b/gi,

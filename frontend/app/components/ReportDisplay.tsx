@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react';
 import Tooltip from './Tooltip';
+import RangeIndicator from './RangeIndicator';
+import TestSummaryChart from './TestSummaryChart';
 import { extractAllVisualizationData, VisualizationData } from '../utils/numericExtraction';
 import { 
   calculateStatistics, 
@@ -162,6 +164,39 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
         </div>
       </div>
 
+      {statistics.testsWithRanges > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Visual Summary
+          </h2>
+          <p className="text-sm text-gray-600 mb-6">
+            This chart shows where your test results fall within their reference ranges. 
+            Values are shown as a percentage of the normal range, not as medical assessments.
+          </p>
+          <TestSummaryChart 
+            data={chartData.map(d => ({
+              name: d.testName,
+              value: d.normalizedPosition * 100,
+              status: d.status,
+            }))}
+          />
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="text-2xl font-bold text-gray-900">{statistics.total}</div>
+              <div className="text-sm text-gray-600">Total Tests</div>
+            </div>
+            <div className="bg-green-50 rounded-lg p-4">
+              <div className="text-2xl font-bold text-green-700">{statistics.withinRange}</div>
+              <div className="text-sm text-gray-600">Within Range</div>
+            </div>
+            <div className="bg-amber-50 rounded-lg p-4">
+              <div className="text-2xl font-bold text-amber-700">{statistics.aboveRange + statistics.belowRange}</div>
+              <div className="text-sm text-gray-600">Outside Range</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           {sectionTitles.interpretations}
@@ -184,6 +219,22 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
                   )}
                 </div>
               </div>
+
+              {visualizationData[index]?.numericValue && 
+               visualizationData[index]?.referenceRange?.type === 'range' && 
+               visualizationData[index]?.referenceRange?.min !== null && 
+               visualizationData[index]?.referenceRange?.max !== null && (
+                <div className="mb-6">
+                  <RangeIndicator
+                    testName={test.testName}
+                    currentValue={visualizationData[index].numericValue!.value}
+                    rangeMin={visualizationData[index].referenceRange!.min!}
+                    rangeMax={visualizationData[index].referenceRange!.max!}
+                    unit={visualizationData[index].numericValue!.unit}
+                    status={visualizationData[index].rangeType}
+                  />
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>
