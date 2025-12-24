@@ -1,4 +1,88 @@
+'use client';
+
+import { useState } from 'react';
+import ReportDisplay from './components/ReportDisplay';
+
+interface AIReportInterpretation {
+  reportMetadata: {
+    patientName: string | null;
+    reportDate: string | null;
+    reportType: string;
+    labName: string | null;
+  };
+  interpretations: Array<{
+    testName: string;
+    value: string;
+    referenceRange: string | null;
+    status: 'within_range' | 'above_range' | 'below_range' | 'unknown';
+    explanation: string;
+    terminology: Array<{
+      term: string;
+      definition: string;
+    }>;
+    context: string;
+  }>;
+  disclaimer: string;
+  nextSteps: string;
+}
+
 export default function Home() {
+  const [reportText, setReportText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [report, setReport] = useState<AIReportInterpretation | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAnalyze = async () => {
+    if (!reportText.trim()) {
+      setError('Please enter or upload a medical report');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:3001/api/analyze-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportText }),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        setReport(result.data);
+      } else {
+        setError(result.message || 'Failed to analyze report');
+      }
+    } catch (err) {
+      setError('Failed to connect to the server. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (report) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-gray-900">
+            Your Simplified Report
+          </h2>
+          <button
+            onClick={() => setReport(null)}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Analyze Another Report
+          </button>
+        </div>
+        <ReportDisplay report={report} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -10,6 +94,12 @@ export default function Home() {
         </p>
       </div>
       
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -45,6 +135,8 @@ export default function Home() {
               <textarea
                 id="report-input"
                 rows={8}
+                value={reportText}
+                onChange={(e) => setReportText(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y placeholder:text-gray-900"
                 placeholder="Paste your medical report text here..."
               />
@@ -66,8 +158,12 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
-            Simplify Report
+          <button 
+            onClick={handleAnalyze}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-8 py-3 rounded-lg transition-colors"
+          >
+            {loading ? 'Analyzing...' : 'Simplify Report'}
           </button>
         </div>
       </div>
