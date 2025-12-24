@@ -1,6 +1,15 @@
 'use client';
 
+import { useMemo } from 'react';
 import Tooltip from './Tooltip';
+import { extractAllVisualizationData, VisualizationData } from '../utils/numericExtraction';
+import { 
+  calculateStatistics, 
+  groupTestsByCategory,
+  prepareChartDataPoints,
+  prepareBarChartData,
+  prepareRangeVisualizations
+} from '../utils/chartDataPreparation';
 
 interface TerminologyDefinition {
   term: string;
@@ -97,6 +106,30 @@ function highlightTerms(text: string, terminology: TerminologyDefinition[]) {
 }
 
 export default function ReportDisplay({ report }: ReportDisplayProps) {
+  const visualizationData = useMemo(() => {
+    return extractAllVisualizationData(report.interpretations);
+  }, [report.interpretations]);
+
+  const chartData = useMemo(() => {
+    return prepareChartDataPoints(visualizationData);
+  }, [visualizationData]);
+
+  const barChartData = useMemo(() => {
+    return prepareBarChartData(visualizationData);
+  }, [visualizationData]);
+
+  const rangeVisualizations = useMemo(() => {
+    return prepareRangeVisualizations(visualizationData);
+  }, [visualizationData]);
+
+  const statistics = useMemo(() => {
+    return calculateStatistics(visualizationData);
+  }, [visualizationData]);
+
+  const categorizedTests = useMemo(() => {
+    return groupTestsByCategory(visualizationData);
+  }, [visualizationData]);
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
